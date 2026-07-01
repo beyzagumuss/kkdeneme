@@ -1,0 +1,17 @@
+services:
+    postgres:
+      image: postgres:15-alpine
+      pull_policy: never
+      container_name: deneme-postgres
+      restart: unless-stopped
+      environment:
+        POSTGRES_USER: beyzauser
+        POSTGRES_PASSWORD: new123
+        POSTGRES_DB: hello_db
+      ports:
+        - "5433:5432"
+      volumes:
+        - deneme_postgres_data:/var/lib/postgresql/data
+
+volumes:
+    deneme_postgres_data:

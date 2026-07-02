@@ -31,16 +31,18 @@ services:
       depends_on:
         postgres:
           condition: service_healthy
+        kafka:
+          condition: service_started
       command: npx nodemon -L server.js
     zookeeper:
-      image: confluentinc/cp-zookeeper:latest
+      image: confluentinc/cp-zookeeper:7.6.0
       container_name: deneme-zookeeper
       environment:
         ZOOKEEPER_CLIENT_PORT: 2181
         ZOOKEEPER_TICK_TIME: 2000
 
     kafka:
-      image: confluentinc/cp-kafka:latest
+      image: confluentinc/cp-kafka:7.6.0
       container_name: deneme-kafka
       depends_on:
         - zookeeper

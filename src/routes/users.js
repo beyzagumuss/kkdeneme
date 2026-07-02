@@ -1,6 +1,6 @@
 const express = require("express");
 const pool = require("../db/pool");
-
+const { sendUserEvent } = require("../kafka/producer");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -42,6 +42,7 @@ router.post("/", async (req, res) => {
     );
 
     res.status(201).json(result.rows[0]);
+    await sendUserEvent("user.created", result.rows[0]);
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }
@@ -73,6 +74,7 @@ router.put("/:id", async (req, res) => {
       message: "user updated",
       user: result.rows[0],
     });
+    await sendUserEvent("user.updated", result.rows[0]);
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }
@@ -95,6 +97,7 @@ router.delete("/:id", async (req, res) => {
       message: "user deleted",
       deletedUser: result.rows[0],
     });
+    await sendUserEvent("user.deleted", req.params.id);
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }

@@ -12,6 +12,45 @@ services:
         - "5433:5432"
       volumes:
         - deneme_postgres_data:/var/lib/postgresql/data
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U beyzauser -d hello_db"]
+        interval: 5s
+        retries: 5
+
+    app:    
+      build: .
+      container_name: deneme-app
+      ports:
+      - "3000:3000"
+      environment:
+        DATABASE_URL: postgresql://beyzauser:new123@postgres:5432/hello_db
+        PORT: 3000
+      volumes:
+        - .:/app
+        - /app/node_modules
+      depends_on:
+        postgres:
+          condition: service_healthy
+      command: npx nodemon -L server.js
+    zookeeper:
+      image: confluentinc/cp-zookeeper:latest
+      container_name: deneme-zookeeper
+      environment:
+        ZOOKEEPER_CLIENT_PORT: 2181
+        ZOOKEEPER_TICK_TIME: 2000
+
+    kafka:
+      image: confluentinc/cp-kafka:latest
+      container_name: deneme-kafka
+      depends_on:
+        - zookeeper
+      ports:
+       - "9092:9092"
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
 volumes:
     deneme_postgres_data:

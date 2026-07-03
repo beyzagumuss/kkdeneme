@@ -14,7 +14,7 @@ async function sendUserEvent(eventType, data) {
   await producer.send({
     topic: "user-events",
     messages: [{
-      key: eventType,
+      key: String(data.id || data),
       value: JSON.stringify({ event: eventType, data, timestamp: new Date().toISOString() }),
     }],
   });

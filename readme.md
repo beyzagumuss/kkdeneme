@@ -36,3 +36,14 @@ docker compose exec kafka kafka-console-consumer \
 
 
 docker compose exec postgres psql -U beyzauser -d hello_db -c "SELECT * FROM users;"
+
+
+//varolan tablolari silmek icin 
+docker compose exec postgres psql -U beyzauser -d hello_db -c "DROP TABLE IF EXISTS users CASCADE;"
+//get ile goruntulemek icin
+curl http://localhost:3000/users
+
+//guncelleme
+curl -X PUT http://localhost:3000/users/<oluşan-uuid> \
+  -H "Content-Type: application/json" \
+  -d '{"name":"ali2","email":"ali2@test.com"}'

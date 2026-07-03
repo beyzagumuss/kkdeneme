@@ -36,13 +36,17 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ ok: false, error: "name ve email zorunlu" });
     }
 
-    const result = await pool.query(
-      "INSERT INTO users (name, email, message) VALUES ($1, $2, $3) RETURNING *",
-      [name, email, message || null]
-    );
+    const id = crypto.randomUUID();
+    const created_at = new Date().toISOString();
+    const user = { id, name, email, message: message || null, created_at };
+    // const result = await pool.query(
+    //   "INSERT INTO users (name, email, message) VALUES ($1, $2, $3) RETURNING *",
+    //   [name, email, message || null]
+    // );
+    // res.status(201).json(result.rows[0]);
 
-    res.status(201).json(result.rows[0]);
-    await sendUserEvent("user.created", result.rows[0]);
+    await sendUserEvent("user.created", user);
+    res.status(201).json(user);
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }
@@ -57,24 +61,13 @@ router.put("/:id", async (req, res) => {
       return res.status(400).json({ ok: false, error: "name ve email zorunlu" });
     }
 
-    const result = await pool.query(
-      `UPDATE users
-       SET name = $1, email = $2, message = $3
-       WHERE id = $4
-       RETURNING *`,
-      [name, email, message || null, id]
-    );
-
-    if (result.rows.length === 0) {
+    const exists = await pool.query("SELECT id FROM users WHERE id=$1", [id]);
+    if (exists.rows.length === 0) {
       return res.status(404).json({ ok: false, error: "user not found" });
     }
 
-    res.json({
-      ok: true,
-      message: "user updated",
-      user: result.rows[0],
-    });
-    await sendUserEvent("user.updated", result.rows[0]);
+    await sendUserEvent("user.updated", { id, name, email, message: message || null });
+    res.json({ ok: true, message: "user update event sent" });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }
@@ -83,21 +76,14 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query(
-      "DELETE FROM users WHERE id = $1 RETURNING *",
-      [id]
-    );
+    
+const exists =await pool.query("SELECT id FROM users WHERE id=$1",[id]);
+if(exists.rows.length===0){
+  return res.status(404).json({ok:false, error:"user cannot deleted"});
+}
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: "user not found" });
-    }
-
-    res.json({
-      ok: true,
-      message: "user deleted",
-      deletedUser: result.rows[0],
-    });
-    await sendUserEvent("user.deleted", req.params.id);
+    await sendUserEvent("user.deleted", id  );
+    res.json({ok: true, message: "user delete event send"})
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }

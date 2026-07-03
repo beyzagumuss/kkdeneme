@@ -11,13 +11,15 @@ async function connect() {
 }
 async function sendUserEvent(eventType, data) {
   await connect();
-  await producer.send({
-    topic: "user-events",
-    messages: [{
-      key: String(data.id || data),
-      value: JSON.stringify({ event: eventType, data, timestamp: new Date().toISOString() }),
-    }],
-  });
+
+  const message = {
+    key: String(data.id || data),
+    value: JSON.stringify({ event: eventType, data, timestamp: new Date().toISOString() }),
+  };
+
+  await producer.send({ topic: "user-events", messages: [message] });
+  
+
   console.log(`Kafka: ${eventType}`);
 }
 

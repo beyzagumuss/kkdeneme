@@ -1,9 +1,9 @@
 const { sendUserEvent } = require("./kafka/producer");
 
 async function seed() {
-  console.log("Seed started: 1000 user inserting");
+  console.log("Seed started: 20000000 user inserting");
 
-  for (let i = 1; i <= 1000; i++) {
+  for (let i = 1; i <= 20000000; i++) {
     const user = {
       id: crypto.randomUUID(),
       name: `User${i}`,
@@ -13,7 +13,7 @@ async function seed() {
     };
     await sendUserEvent("user.created", user);
 
-    if (i % 100 === 0) console.log(`${i}/1000 sent`);
+    if (i % 100 === 0) console.log(`${i}/20000000 sent`);
   }
 
   console.log("Seed completed");

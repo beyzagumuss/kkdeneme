@@ -16,7 +16,7 @@ async function runConsumer() {
   switch (event) {
     case "user.created":
       await pool.query(
-        "INSERT INTO users (id, name, email, message, created_at) VALUES ($1,$2,$3,$4,$5) ON CONFLICT (id) DO NOTHING",
+        "INSERT INTO users (id, name, email, message, created_at) VALUES ($1,$2,$3,$4,$5) ON CONFLICT (email) DO NOTHING",
         [data.id, data.name, data.email, data.message, data.created_at]
       );
       break;

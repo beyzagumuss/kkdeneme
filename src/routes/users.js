@@ -5,8 +5,27 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM users ORDER BY id ASC");
-    res.json(result.rows);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const offset = (page - 1) * limit;
+
+    const countResult = await pool.query("SELECT COUNT(*) FROM users");
+    const total = parseInt(countResult.rows[0].count);
+
+    const result = await pool.query(
+      "SELECT * FROM users ORDER BY id ASC LIMIT $1 OFFSET $2",
+      [limit, offset]
+    );
+
+    res.json({
+      data: result.rows,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }

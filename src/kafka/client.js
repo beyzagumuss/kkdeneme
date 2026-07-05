@@ -1,12 +1,18 @@
 const { Kafka } = require("kafkajs");
 
-const kafka = new Kafka({
-  clientId: "deneme-app",
-  brokers: [
-    process.env.KAFKA_BROKER_1 || "kafka1:9092",
-    process.env.KAFKA_BROKER_2 || "kafka2:9093",
-    process.env.KAFKA_BROKER_3 || "kafka3:9094",
-  ],
+const producerKafka = new Kafka({
+  clientId: "deneme-app-producer",
+  brokers: ["kafka1:9092"],  // Cluster A
 });
 
-module.exports = kafka;
+const consumerKafka = new Kafka({
+  clientId: "deneme-app-consumer",
+  brokers: ["kafka1:9092"],  // Cluster A (ana consumer)
+});
+
+const syncKafka = new Kafka({
+  clientId: "deneme-app-sync",
+  brokers: ["kafka1:9092"],  // Cluster A (sync için)
+});  // ← Sync #1 için ayrı client (opsiyonel, aynı cluster)
+
+module.exports = { producerKafka, consumerKafka, syncKafka };

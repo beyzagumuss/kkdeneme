@@ -2,6 +2,7 @@ const app = require("./app");
 const initDb = require("./db/initDb");
 const { runConsumer } = require("./kafka/consumer");
 const { startOutboxRelay } = require("./outboxRelay.js");
+const { startReplicator } = require("./replicator");
 
 const port = process.env.PORT || 3000;
 
@@ -26,8 +27,12 @@ initDb()
     });
     startConsumerWithRetry();
     startOutboxRelay();
+    startReplicator();
   })
   .catch((err) => {
     console.error("DB init failed:", err.message);
     process.exit(1);
   });
+
+
+  

@@ -1,7 +1,7 @@
-const kafka = require("./client");
+const { producerKafka } = require("./client");
 const { saveToOutbox } = require("../db/outbox");
 
-const producer = kafka.producer({ compression: "gzip" });
+const producer = producerKafka.producer({ compression: "gzip" });
 let connected = false;
 
 async function connect() {

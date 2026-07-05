@@ -1,12 +1,12 @@
 const { sendBatch } = require("./kafka/producer");
 
 async function seed() {
-  console.log("Seed started: 1000 user inserting");
+  console.log("Seed started: 20000000 user inserting");
 
  const BATCH_SIZE = 500;
 let batch = [];
 
-for (let i = 1; i <= 1000; i++) {
+for (let i = 1; i <= 20000000; i++) {
     const user = {
     id: crypto.randomUUID(),
     name: `User${i}`,
@@ -19,7 +19,7 @@ for (let i = 1; i <= 1000; i++) {
   if (batch.length >= BATCH_SIZE) {
     await sendBatch(batch);
     batch = [];
-    console.log(`${i}/${1000} sent`);
+    console.log(`${i}/${20000000} sent`);
   }
 }
 if (batch.length) await sendBatch(batch);
